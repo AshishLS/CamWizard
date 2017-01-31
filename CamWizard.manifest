@@ -1,0 +1,15 @@
+{
+	"autodeskProduct":	"Fusion360",
+	"type":	"addin",
+	"author":	"Ashish S",
+	"description":	{
+		"":	"Define places in your model take snaps and play it in a loop to see amazing effects."
+	},
+	"supportedOS":	"windows|mac",
+	"editEnabled":	true,
+	"id":	"dede2e9e-bee2-4428-9992-ff9e9c69c92c",
+	"version":	"1.0",
+	"runOnStartup":	false,
+	"sourcewindows":	"CamWizard.vcxproj",
+	"sourcemac":	"CamWizard.xcodeproj"
+}
