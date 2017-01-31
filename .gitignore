@@ -1,0 +1,13 @@
+*.lib
+Debug/CamWizard.pdb
+Debug/vc140.pdb
+*.idb
+Debug/CamWizard.tlog/link.write.1.tlog
+*.tlog
+Debug/CamWizard.obj
+*.log
+Debug/CamWizard.exp
+*.dll
+CamWizard.sdf
+*.opensdf
+.vs/CamWizard/v14/.suo

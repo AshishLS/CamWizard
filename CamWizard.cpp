@@ -1,14 +1,14 @@
 
 #include <Core/CoreAll.h>
 #include <Fusion/FusionAll.h>
-#include <CAM/CAMAll.h>
+//#include <CAM/CAMAll.h>
 #include <vector>
 #include <windows.h>
 
 
 using namespace adsk::core;
 using namespace adsk::fusion;
-using namespace adsk::cam;
+//using namespace adsk::cam;
 
 Ptr<Application> app;
 Ptr<UserInterface> ui;
@@ -140,7 +140,7 @@ public:
 class CamWizardInputCommandChangedHandeler : public adsk::core::InputChangedEventHandler
 {
 public:
-	/*void notify(const Ptr < InputChangedEventArgs>& eventArgs) override
+	void notify(const Ptr < InputChangedEventArgs>& eventArgs) override
 	{
 		Ptr<CommandInput> changedInput = eventArgs->input();
 
@@ -161,45 +161,7 @@ public:
 		{
 			gCamManager->Stop();
 		}
-	}*/
-	void notify(const Ptr < InputChangedEventArgs>& eventArgs) override
-	{
-		Ptr<CommandInput> changedInput = eventArgs->input();
-
-		std::string debugName = changedInput->name();
-
-		if (changedInput->id() == INPUT_BUTTONS_ROW)
-		{
-			auto buttonRowCmdInput = changedInput->cast<ButtonRowCommandInput>();
-			if (checkReturn(buttonRowCmdInput))
-			{
-				buttonRowCmdInput->selectedItem()->isSelected(false);
-				/*auto buttonRowListItems = buttonRowCmdInput->listItems();
-				if (checkReturn(buttonRowListItems))
-				{
-					for (auto& item : buttonRowListItems)
-					{
-						if (!item->isSelected() && item->name() != STOP_REEL)
-							continue;
-						if (item->name() == ADD_POINT)
-							1;
-						if (item->name() == PLAY_REEL)
-							1;
-						if (item->name() == STOP_REEL)
-							item->isSelected(true);
-
-						item->isSelected(false);
-					}
-
-				}
-				else
-				{
-					assert(!"buttonRowCmdInput->listItems() returned invalid ListItems.");
-				}*/
-			}
-		}
 	}
-
 }_camWizardInputChanged;
 
 class CamWizardCommandCreatedEventHandler : public adsk::core::CommandCreatedEventHandler
