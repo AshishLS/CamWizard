@@ -1,14 +1,14 @@
 
 #include <Core/CoreAll.h>
 #include <Fusion/FusionAll.h>
-//#include <CAM/CAMAll.h>
+#include <CAM/CAMAll.h>
 #include <vector>
 #include <windows.h>
 
 
 using namespace adsk::core;
 using namespace adsk::fusion;
-//using namespace adsk::cam;
+using namespace adsk::cam;
 
 Ptr<Application> app;
 Ptr<UserInterface> ui;
@@ -162,56 +162,45 @@ public:
 			gCamManager->Stop();
 		}
 	}
-}_camWizardInputChanged;
-
-class CamWizardCommandCreatedEventHandler : public adsk::core::CommandCreatedEventHandler
-{
-public:
-	void notify(const Ptr<CommandCreatedEventArgs>& eventArgs) override
+	/*void notify(const Ptr < InputChangedEventArgs>& eventArgs) override
 	{
-		// Verify that a Fusion design is active.
-		Ptr<Design> des = app->activeProduct();
-		if (!checkReturn(des))
+		Ptr<CommandInput> changedInput = eventArgs->input();
+
+		std::string debugName = changedInput->name();
+
+		if (changedInput->id() == INPUT_BUTTONS_ROW)
 		{
-			ui->messageBox("A Fusion design must be active when invoking this command.");
-			return;
+			auto buttonRowCmdInput = changedInput->cast<ButtonRowCommandInput>();
+			if (checkReturn(buttonRowCmdInput))
+			{
+				buttonRowCmdInput->selectedItem()->isSelected(false);
+				auto buttonRowListItems = buttonRowCmdInput->listItems();
+				if (checkReturn(buttonRowListItems))
+				{
+					for (auto& item : buttonRowListItems)
+					{
+						if (!item->isSelected() && item->name() != STOP_REEL)
+							continue;
+						if (item->name() == ADD_POINT)
+							1;
+						if (item->name() == PLAY_REEL)
+							1;
+						if (item->name() == STOP_REEL)
+							item->isSelected(true);
+
+						item->isSelected(false);
+					}
+
+				}
+				else
+				{
+					assert(!"buttonRowCmdInput->listItems() returned invalid ListItems.");
+				}
+			}
 		}
+	}*/
 
-		Ptr<Command> cmd = eventArgs->command();
-		cmd->isExecutedWhenPreEmpted(false);
-		Ptr<CommandInputs> inputs = cmd->commandInputs();
-		if (!checkReturn(inputs))
-			return;
-
-		// Define the command dialog.
-		imgInput = inputs->addImageCommandInput("CamWizardImage", "", "Resources/CamWizardImage.png");
-		if (!checkReturn(imgInput))
-			return;
-		imgInput->isFullWidth(true);
-
-		// Rendezvous Points dropdown.
-		dropDownRendezvousPts = inputs->addDropDownCommandInput(DROPDOWN_RENDEZVOUS_POINTS, "Rendezvous Points", TextListDropDownStyle);
-		if (!checkReturn(dropDownRendezvousPts))
-			return;
-
-		// Buuton row
-		Ptr<ButtonRowCommandInput> buttonsRowInput = inputs->addButtonRowCommandInput(INPUT_BUTTONS_ROW, "Input Button Row", false);
-		buttonsRowInput->commandInputs()->addBoolValueInput(ADD_POINT, ADD_POINT, false, "resources/AddPoint");
-		buttonsRowInput->commandInputs()->addBoolValueInput(PLAY_REEL, PLAY_REEL, false, "resources/DeletePoint");
-		/*buttonsRowInput->listItems()->add(ADD_POINT, false, "resources/AddPoint");
-		buttonsRowInput->listItems()->add(PLAY_REEL, false, "resources/DeletePoint");
-		buttonsRowInput->listItems()->add(STOP_REEL, false, "resources/StopPlaying");*/
-
-		// Connect to the command related events.
-		Ptr<InputChangedEvent> inputChnagedEvent = cmd->inputChanged();
-		if (!checkReturn(inputChnagedEvent))
-			return;
-		bool isOk = inputChnagedEvent->add(&_camWizardInputChanged);
-		if (!isOk)
-			return;
-
-	}
-} _camWizardCreated;
+}_camWizardInputChanged;
 
 //class CamWizardCommandCreatedEventHandler : public adsk::core::CommandCreatedEventHandler
 //{
@@ -243,23 +232,13 @@ public:
 //		if (!checkReturn(dropDownRendezvousPts))
 //			return;
 //
-//		// Table Input
-//		// Create table input
-//		Ptr<TableCommandInput> tableInput = inputs->addTableCommandInput(INPUT_LAYOUT_TABLE, "Table", 3, "1:1:1");
-//		tableInput->tablePresentationStyle(adsk::core::TablePresentationStyles::transparentBackgroundTablePresentationStyle);
-//
-//		// Add point delete point buttons.
-//		Ptr<CommandInput> addButtonInput = inputs->addBoolValueInput(tableInput->id() + "_add", ADD_POINT, false, "resources/AddPoint", true);
-//		tableInput->addToolbarCommandInput(addButtonInput);
-//		//Ptr<CommandInput> deleteButtonInput = inputs->addBoolValueInput(tableInput->id() + "_delete", DELETE_POINT, false, "resources/DeletePoint", true);
-//		//tableInput->addToolbarCommandInput(deleteButtonInput);
-//
-//		// Play
-//		Ptr<CommandInput> playButtonInput = inputs->addBoolValueInput(tableInput->id() + "_play", PLAY_REEL, false, "resources/DeletePoint", true);
-//		tableInput->addToolbarCommandInput(playButtonInput);
-//		// Stop
-//		Ptr<CommandInput> stopButtonInput = inputs->addBoolValueInput(tableInput->id() + "_stop", STOP_REEL, false, "resources/StopPlaying", true);
-//		tableInput->addToolbarCommandInput(stopButtonInput);
+//		// Buuton row
+//		Ptr<ButtonRowCommandInput> buttonsRowInput = inputs->addButtonRowCommandInput(INPUT_BUTTONS_ROW, "Input Button Row", false);
+//		buttonsRowInput->commandInputs()->addBoolValueInput(ADD_POINT, ADD_POINT, false, "resources/AddPoint");
+//		buttonsRowInput->commandInputs()->addBoolValueInput(PLAY_REEL, PLAY_REEL, false, "resources/DeletePoint");
+//		/*buttonsRowInput->listItems()->add(ADD_POINT, false, "resources/AddPoint");
+//		buttonsRowInput->listItems()->add(PLAY_REEL, false, "resources/DeletePoint");
+//		buttonsRowInput->listItems()->add(STOP_REEL, false, "resources/StopPlaying");*/
 //
 //		// Connect to the command related events.
 //		Ptr<InputChangedEvent> inputChnagedEvent = cmd->inputChanged();
@@ -271,6 +250,65 @@ public:
 //
 //	}
 //} _camWizardCreated;
+
+class CamWizardCommandCreatedEventHandler : public adsk::core::CommandCreatedEventHandler
+{
+public:
+	void notify(const Ptr<CommandCreatedEventArgs>& eventArgs) override
+	{
+		// Verify that a Fusion design is active.
+		Ptr<Design> des = app->activeProduct();
+		if (!checkReturn(des))
+		{
+			ui->messageBox("A Fusion design must be active when invoking this command.");
+			return;
+		}
+
+		Ptr<Command> cmd = eventArgs->command();
+		cmd->isExecutedWhenPreEmpted(false);
+		Ptr<CommandInputs> inputs = cmd->commandInputs();
+		if (!checkReturn(inputs))
+			return;
+
+		// Define the command dialog.
+		imgInput = inputs->addImageCommandInput("CamWizardImage", "", "Resources/CamWizardImage.png");
+		if (!checkReturn(imgInput))
+			return;
+		imgInput->isFullWidth(true);
+
+		// Rendezvous Points dropdown.
+		dropDownRendezvousPts = inputs->addDropDownCommandInput(DROPDOWN_RENDEZVOUS_POINTS, "Rendezvous Points", TextListDropDownStyle);
+		if (!checkReturn(dropDownRendezvousPts))
+			return;
+
+		// Table Input
+		// Create table input
+		Ptr<TableCommandInput> tableInput = inputs->addTableCommandInput(INPUT_LAYOUT_TABLE, "Table", 3, "1:1:1");
+		tableInput->tablePresentationStyle(adsk::core::TablePresentationStyles::transparentBackgroundTablePresentationStyle);
+
+		// Add point delete point buttons.
+		Ptr<CommandInput> addButtonInput = inputs->addBoolValueInput(tableInput->id() + "_add", ADD_POINT, false, "resources/AddPoint", true);
+		tableInput->addToolbarCommandInput(addButtonInput);
+		//Ptr<CommandInput> deleteButtonInput = inputs->addBoolValueInput(tableInput->id() + "_delete", DELETE_POINT, false, "resources/DeletePoint", true);
+		//tableInput->addToolbarCommandInput(deleteButtonInput);
+
+		// Play
+		Ptr<CommandInput> playButtonInput = inputs->addBoolValueInput(tableInput->id() + "_play", PLAY_REEL, false, "resources/DeletePoint", true);
+		tableInput->addToolbarCommandInput(playButtonInput);
+		// Stop
+		Ptr<CommandInput> stopButtonInput = inputs->addBoolValueInput(tableInput->id() + "_stop", STOP_REEL, false, "resources/StopPlaying", true);
+		tableInput->addToolbarCommandInput(stopButtonInput);
+
+		// Connect to the command related events.
+		Ptr<InputChangedEvent> inputChnagedEvent = cmd->inputChanged();
+		if (!checkReturn(inputChnagedEvent))
+			return;
+		bool isOk = inputChnagedEvent->add(&_camWizardInputChanged);
+		if (!isOk)
+			return;
+
+	}
+} _camWizardCreated;
 
 extern "C" XI_EXPORT bool run(const char* context)
 {
